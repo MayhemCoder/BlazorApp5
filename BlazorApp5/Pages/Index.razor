@@ -1,0 +1,83 @@
+﻿@page "/"
+@using Models
+
+<table>
+	<tr>
+		<th>
+			BattVoltage
+		</th>
+		<th>
+			ConcentratorId
+		</th>
+		<th>
+			DeviceId
+		</th>
+		<th>
+			IsLocked
+		</th>
+		<th>
+			LastMsgReceived
+		</th>
+		<th>
+			LockUnlockTag
+		</th>
+		<th>
+			LockerName
+		</th>
+		<th>
+			LockerNumber
+		</th>
+	</tr>
+	@foreach (var device in Devices!)
+	{
+		<tr>
+			<td>
+				@device.BattVoltage
+			</td>
+			<td>
+				@device.ConcentratorId
+			</td>
+			<td>
+				@device.DeviceId
+			</td>
+			<td>
+				@device.IsLocked
+			</td>
+			<td>
+				@device.LastMsgReceived
+			</td>
+			<td>
+				@device.LockUnlockTag
+			</td>
+			<td>
+				@device.LockerName
+			</td>
+			<td>
+				@device.LockerNumber
+			</td>
+		</tr>
+	}
+</table>
+
+
+@code {
+	[Inject]
+	IHttpClientFactory ClientFactory { get; set; } = null!;
+	
+
+	IEnumerable<DeviceDto>? Devices { get; set; } = Enumerable.Empty<DeviceDto>();
+	
+	protected override async Task OnInitializedAsync()
+	{
+		var client = ClientFactory.CreateClient();
+		client.BaseAddress = new Uri("http://portal.hasam.cz:8122");
+		
+
+		
+		var response = await client.GetAsync("/SystemConnector/Device/GetLockers");
+		
+		Devices = await response.Content.ReadFromJsonAsync<IEnumerable<DeviceDto>?>();
+		
+
+	}
+}
